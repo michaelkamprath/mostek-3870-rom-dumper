@@ -1,0 +1,3 @@
+[submodule "schematics/kicad-symbols/teensy_library"]
+	path = schematics/kicad-symbols/teensy_library
+	url = git@github.com:XenGi/teensy_library.git
