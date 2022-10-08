@@ -1,4 +1,3 @@
 (sym_lib_table
   (lib (name "mostek_3870")(type "KiCad")(uri "${KIPRJMOD}/../kicad-symbols/mostek_3870.kicad_sym")(options "")(descr ""))
-  (lib (name "teensy")(type "Legacy")(uri "${KIPRJMOD}/../kicad-symbols/teensy_library/teensy.lib")(options "")(descr ""))
 )
