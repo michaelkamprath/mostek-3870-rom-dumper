@@ -1,0 +1,39 @@
+#require "mostek-3870-asm >= 0.0.1"
+
+start:
+    dci test_data
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+    lm
+
+
+.org $388
+test_data:
+    .byte $F1
+    .byte $F2
+    .byte $F3
+    .byte $F4
+    .byte $F5
+    .byte $F6
+    .byte $F7
+    .byte $F8
+    .byte $F9
+    .byte $FA
+    .byte $FB
+    .byte $FC
+    .byte $FD
+    .byte $FE
+    .byte $FF
+

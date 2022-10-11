@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "mk3870-rom-dumper-driver"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"istream": "cpp",
+			"*.tcc": "cpp"
+		}
+	}
+}
