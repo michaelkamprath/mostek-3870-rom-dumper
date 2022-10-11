@@ -1,0 +1,5 @@
+# MOSTEK 3870 ROM Dumper Schematics
+
+The `mostek-3870-rom-dumper` directory herein contains the KiCad schematics for the ROM dumper. Note that it uses an `ATEMEGA1284P` as the microcontroller. The `ATMEGA1284P` should have a suitable boot loader installed on it, such as [MightyCore](https://github.com/MCUdude/MightyCore). 
+
+The design requires 3 different voltage levels. There `LM317T` adjustable voltage regulators are used to provide the required voltages from a single 9V source. Note that the `MK3870` works best with a voltage slightly lower than 5V, as at 5V or above it will randomly raise LOW values on port 4 to be HIGH-enough that the `ATEMEGA1284P` perceives it as a HIGH. This design calls for 4.8V to be the VCC for both the `MK3870` and the `ATEMEGA1284P`. The `LM317T` that is used to provide the 4.8V will likely need a heat sink as the current draw is greatest through that one. It is recommended that when constructing this design that the `LM317T`s are setup first and the voltages failed in before connecting them to the rest of the circuit.
