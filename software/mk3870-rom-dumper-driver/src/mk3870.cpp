@@ -178,6 +178,13 @@ void MK3870::prepareForDump(void)
 
 void MK3870::writeBytecodeAndTick(uint8_t bytecode, uint8_t internal_ticks)
 {
+    // the byte code should be on the data bus after 1/2 internal clock cycle
+    // and then the data bus restored to 0 halfway through the last internal
+    // clock cycle.
+    //
+    // the internal_ticks argument represent the number of internal clock cycles
+    // that follows the initial clock cycle that clocked in the byte code onto
+    // the data bus.
     this->tickExternalClock();
     this->writeToPort5(bytecode);
     this->tickExternalClock();
@@ -219,7 +226,7 @@ bool MK3870::dumpROM(uint16_t rom_bytes, uint8_t* data_ptr, int led_pin = -1) {
         this->tickExternalClock();
 
 
-        // tick 5 more times
+        // tick 5 internal clock more times
         this->tickInternalClock();
         this->tickInternalClock();
         this->tickInternalClock();

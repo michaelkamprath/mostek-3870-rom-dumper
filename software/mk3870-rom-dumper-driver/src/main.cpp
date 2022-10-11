@@ -7,7 +7,9 @@ void printAddress(uint16_t addr);
 void printByteValue(uint8_t value);
 
 // constants
+// The ROM size to be dumped. Adjust according to the MK3870 variant being dumped.
 const uint16_t ROM_BYTES = 2048;
+// The ATMEGA1284P pin the sttus LED is attaced to
 const uint8_t STATUS_LED_PIN = PIN_PB0;
 
 // globals
@@ -50,8 +52,8 @@ void loop() {
   }
 #if 0
   // Call the code that does only a dump of the MK3870 data bus
-  // as it runs through the code on the EEPROM. Useful for 
-  // figuring out the instruction timing rewuqirments.
+  // as it runs through the code on the EEPROM. Useful for
+  // figuring out the instruction timing requirements.
   device->logClockCycles(200,STATUS_LED_PIN);
 #else
   Serial.println(F("\nStarting ROM dump ..."));
