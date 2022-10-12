@@ -2289,6 +2289,10 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 93e99c04-d3aa-437f-bcc5-9bcacf7d9472)
   )
+  (text "The 4066 should be powered\nby the 9V source" (at 207.01 120.65 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 973dabf7-5522-426a-8446-ce0d6402fbfd)
+  )
   (text "RX" (at 30.734 159.004 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid aa992711-5b57-48de-a12f-9d8f226cb1a2)
@@ -2903,22 +2907,6 @@
     (pin "2" (uuid 3fc81b7f-90a3-4246-9b46-068840961114))
   )
 
-  (symbol (lib_id "power:VCC") (at 202.438 119.634 0) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid 7468eaa7-1dfd-45de-8872-4aed59c3c0a3)
-    (property "Reference" "#PWR0102" (id 0) (at 202.438 123.444 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Value" "VCC" (id 1) (at 202.438 115.824 0))
-    (property "Footprint" "" (id 2) (at 202.438 119.634 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 202.438 119.634 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 9b3b0779-f328-403a-a9a8-de9e03a59414))
-  )
-
   (symbol (lib_id "power:VCC") (at 150.368 48.26 0) (unit 1)
     (in_bom yes) (on_board yes)
     (uuid 7490876e-c260-45bb-9567-709162aa9f0f)
@@ -2933,6 +2921,22 @@
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 8c040b76-725c-452c-95ba-059b83b4f7c1))
+  )
+
+  (symbol (lib_id "power:+9V") (at 202.438 119.634 0) (unit 1)
+    (in_bom yes) (on_board yes) (fields_autoplaced)
+    (uuid 7d940308-7708-4193-803e-24eeb54c87f9)
+    (property "Reference" "#PWR?" (id 0) (at 202.438 123.444 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "+9V" (id 1) (at 202.438 116.0582 0))
+    (property "Footprint" "" (id 2) (at 202.438 119.634 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (id 3) (at 202.438 119.634 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 6cb21810-d019-4e9c-a2a4-6e1cf0fb9987))
   )
 
   (symbol (lib_id "Device:R") (at 102.235 164.465 90) (unit 1)
@@ -3319,9 +3323,6 @@
     (path "/b5b91fb7-d02b-4f35-8c5d-81941079030e"
       (reference "#PWR0101") (unit 1) (value "GND") (footprint "")
     )
-    (path "/7468eaa7-1dfd-45de-8872-4aed59c3c0a3"
-      (reference "#PWR0102") (unit 1) (value "VCC") (footprint "")
-    )
     (path "/55404903-c030-44ad-b9e0-2d56116e36cc"
       (reference "#PWR0103") (unit 1) (value "GND") (footprint "")
     )
@@ -3372,6 +3373,9 @@
     )
     (path "/269744d2-71bc-4a3b-a71e-4e9e5347d4c6"
       (reference "#PWR0119") (unit 1) (value "GND") (footprint "")
+    )
+    (path "/7d940308-7708-4193-803e-24eeb54c87f9"
+      (reference "#PWR?") (unit 1) (value "+9V") (footprint "")
     )
     (path "/30092a32-fb53-42b0-ace5-6393064aca45"
       (reference "C1") (unit 1) (value "C") (footprint "")
