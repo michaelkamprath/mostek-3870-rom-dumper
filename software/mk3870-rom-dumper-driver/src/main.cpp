@@ -1,6 +1,14 @@
 #include <Arduino.h>
 #include "mk3870.h"
 
+#ifndef LOG_CLOCK_TIMING
+#define LOG_CLOCK_TIMING 0
+#endif
+
+#ifndef INTEL_HEX_FORMAT
+#define INTEL_HEX_FORMAT 1
+#endif
+
 #define HEX_CHARS_PER_LINE 16
 // local functions
 void printAddress(uint16_t addr);
@@ -50,7 +58,7 @@ void loop() {
   while (Serial.available()) {
     Serial.read();
   }
-#if 0
+#if LOG_CLOCK_TIMING
   // Call the code that does only a dump of the MK3870 data bus
   // as it runs through the code on the EEPROM. Useful for
   // figuring out the instruction timing requirements.
@@ -61,6 +69,34 @@ void loop() {
     Serial.println(F("\n\nROM dump"));
     Serial.println(F("================"));
     // print hex data
+#if INTEL_HEX_FORMAT
+    int line_char_count = 0;
+    int line_checksum = 0;
+    for (uint16_t i = 0; i < ROM_BYTES; i++) {
+      if (line_char_count == 0) {
+        Serial.print(F(":"));
+        // byte count
+        printByteValue(HEX_CHARS_PER_LINE);
+        // address
+        printAddress(i);
+        // record type
+        printByteValue(0);
+
+        // checksume should be adding individual bytes, but recrd type is 0
+        line_checksum = HEX_CHARS_PER_LINE + ((i>>8)&0xFF) + (i&0xFF);
+      }
+      printByteValue(data_ptr[i]);
+      line_checksum += data_ptr[i];
+      line_char_count++;
+      if (line_char_count >= HEX_CHARS_PER_LINE) {
+        // gets 2's complement of LSB of checksum
+        int checksum_value = (~(line_checksum&0xFF))+1;
+        printByteValue(checksum_value);
+        Serial.println(F(""));
+        line_char_count = 0;
+      }
+    }
+#else
     int line_char_count = 0;
     for (uint16_t i = 0; i < ROM_BYTES; i++) {
       if (line_char_count == 0) {
@@ -78,6 +114,7 @@ void loop() {
         line_char_count = 0;
       }
     }
+#endif
     Serial.println(F("================\n\n"));
   }
 #endif
