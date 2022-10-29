@@ -30,6 +30,10 @@ public:
     void setTestVoltage7(void);
     void setTestVoltage3p5(void);
 
+    // Control the popwer going to the MK3870
+    void powerOff(void);
+    void powerOn(void);
+
     // read the byte value currently on MK3870 port 4
     uint8_t readFromPort4(void);
 

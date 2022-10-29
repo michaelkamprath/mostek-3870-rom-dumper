@@ -5,7 +5,7 @@
 // Heavily inspired by Sean Riddle's implementation at:
 //      http://www.seanriddle.com/3870dumper.pbp
 //
-#define CLOCK_DELAY_US 2
+#define CLOCK_DELAY_US 1
 
 const uint8_t PORT4_PINS[] =  {PIN_PA0, PIN_PA1, PIN_PA2, PIN_PA3, PIN_PA4, PIN_PA5, PIN_PA6, PIN_PA7};
 const uint8_t PORT5_PINS[] =  {PIN_PC0, PIN_PC1, PIN_PC2, PIN_PC3, PIN_PC4, PIN_PC5, PIN_PC6, PIN_PC7};
@@ -16,6 +16,7 @@ const uint8_t STROBE_PIN = PIN_PB3;
 
 const uint8_t ACTIVATE_TEST_7V_PIN = PIN_PD6;
 const uint8_t ACTIVATE_TEST_3p5V_PIN = PIN_PD7;
+const uint8_t MK3870_POWER_PIN = PIN_PD5;
 
 MK3870::MK3870()
 {
@@ -49,6 +50,8 @@ void MK3870::setupPins(void)
     // test pin voltage control
     pinMode(ACTIVATE_TEST_7V_PIN, OUTPUT);
     pinMode(ACTIVATE_TEST_3p5V_PIN, OUTPUT);
+    pinMode(MK3870_POWER_PIN, OUTPUT);
+    this->powerOff();
     this->setTestVoltageOff();
 }
 
@@ -87,56 +90,61 @@ void MK3870::setTestVoltageOff(void)
 {
     digitalWrite(ACTIVATE_TEST_7V_PIN, LOW);
     digitalWrite(ACTIVATE_TEST_3p5V_PIN, LOW);
-    delayMicroseconds(50);
 }
 
 void MK3870::setTestVoltage7(void)
 {
     this->setTestVoltageOff();
     digitalWrite(ACTIVATE_TEST_7V_PIN, HIGH);
-    delayMicroseconds(50);
 }
 
 void MK3870::setTestVoltage3p5(void)
 {
     this->setTestVoltageOff();
     digitalWrite(ACTIVATE_TEST_3p5V_PIN, HIGH);
-    delayMicroseconds(50);
+}
+
+void MK3870::powerOff(void)
+{
+    digitalWrite(MK3870_POWER_PIN, HIGH);
+}
+void MK3870::powerOn(void)
+{
+    digitalWrite(MK3870_POWER_PIN, LOW);
+    delayMicroseconds(CLOCK_DELAY_US);
 }
 
 uint8_t MK3870::readFromPort4(void)
 {
-    uint8_t value = 0;
-    for (uint8_t i = 0; i < 8; i++) {
-        if (digitalRead(PORT4_PINS[i]) == HIGH) {
-            value |= (1 << i);
-        }
-    }
-    return value;
+    return PINA;
 }
 
 void MK3870::writeToPort5(uint8_t value)
 {
+    static uint8_t BITS[8] = {1,2,4,8,16,32,64,128};
     // invert the value since port is active low
     uint8_t inverted_value = ~value;
-
+#if 1
     for (uint8_t i = 0; i < 8; i++) {
         uint8_t bit_value = LOW;
-        if (inverted_value&(1 << i)) {
+        if (inverted_value&BITS[i]) {
             bit_value = HIGH;
         }
         digitalWrite(PORT5_PINS[i],bit_value);
     }
+#else
+    PINC = inverted_value;
+#endif
 }
 
 void MK3870::prepareForDump(void)
 {
     Serial.println(F("  preparing for dump"));
-
     this->writeToPort5(0);
     this->setTestVoltage3p5();
     this->reset();
 
+#if 1
     // wait for strobe = LOW after reset
     // need to drive clock "manually" here to detect when strobe
     // resets. When it does reset, ensure the external clock is aligned to
@@ -170,10 +178,13 @@ void MK3870::prepareForDump(void)
             strobe_not_found = false;
         }
     }
+#if 1
     if (half_off) {
         // if we are here, the strobe is 1/2 a clock off. tick it again
         this->tickExternalClock();
     }
+#endif
+#endif
 }
 
 void MK3870::writeBytecodeAndTick(uint8_t bytecode, uint8_t internal_ticks)
@@ -200,6 +211,7 @@ bool MK3870::dumpROM(uint16_t rom_bytes, uint8_t* data_ptr, int led_pin = -1) {
     if (led_pin >= 0) {
         digitalWrite(led_pin, HIGH);
     }
+    this->powerOn();
     this->prepareForDump();
     this->setTestVoltage7();
     this->writeToPort5(0);
@@ -236,7 +248,7 @@ bool MK3870::dumpROM(uint16_t rom_bytes, uint8_t* data_ptr, int led_pin = -1) {
 
     // done, reset the MK3870
     this->setTestVoltageOff();
-    this->reset();
+    this->powerOff();
 
     if (led_pin >= 0) {
         digitalWrite(led_pin, LOW);
@@ -256,6 +268,7 @@ bool MK3870::logClockCycles(int num_cycles, int led_pin = -1) {
         Serial.println(F("\n\nERROR - could not allocate data buffer"));
         return false;
     }
+    this->powerOn();
     this->prepareForDump();
     this->setTestVoltage3p5();
 
@@ -268,21 +281,22 @@ bool MK3870::logClockCycles(int num_cycles, int led_pin = -1) {
     int idx = 0;
     for (int i = 0; i < num_cycles; i++) {
         digitalWrite(XTAL2_PIN, LOW);
-        delayMicroseconds(CLOCK_DELAY_US);
         data[idx++] = this->readFromPort4();
         data[idx++] = digitalRead(STROBE_PIN);
         digitalWrite(XTAL2_PIN, HIGH);
-        delayMicroseconds(CLOCK_DELAY_US);
         data[idx++] = this->readFromPort4();
         data[idx++] = digitalRead(STROBE_PIN);
         digitalWrite(XTAL2_PIN, LOW);
-        delayMicroseconds(CLOCK_DELAY_US);
         data[idx++] = this->readFromPort4();
         data[idx++] = digitalRead(STROBE_PIN);
         digitalWrite(XTAL2_PIN, HIGH);
-        delayMicroseconds(CLOCK_DELAY_US);
         data[idx++] = this->readFromPort4();
         data[idx++] = digitalRead(STROBE_PIN);
+    }
+    this->setTestVoltageOff();
+    this->powerOff();
+    if (led_pin >= 0) {
+        digitalWrite(led_pin, LOW);
     }
 
     idx = 0;
@@ -316,10 +330,6 @@ bool MK3870::logClockCycles(int num_cycles, int led_pin = -1) {
         Serial.print(data[idx++]);
         Serial.print(F("\n"));
 
-    }
-    this->setTestVoltageOff();
-    if (led_pin >= 0) {
-        digitalWrite(led_pin, LOW);
     }
 
     free(data);
