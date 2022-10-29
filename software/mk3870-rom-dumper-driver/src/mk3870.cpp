@@ -59,7 +59,7 @@ void MK3870::reset(void)
 {
     Serial.println(F("  reseting MK3870"));
     digitalWrite(RESET_PIN, LOW);
-    for (int i = 0; i < 255; i++){
+    for (int i = 0; i < 8; i++){
         this->tickInternalClock();
     }
     digitalWrite(RESET_PIN, HIGH);
@@ -106,10 +106,17 @@ void MK3870::setTestVoltage3p5(void)
 
 void MK3870::powerOff(void)
 {
-    digitalWrite(MK3870_POWER_PIN, HIGH);
+    digitalWrite(MK3870_POWER_PIN, HIGH);\
+   // set all lines low so no power enters MK3870
+    digitalWrite(XTAL2_PIN, LOW);
+    digitalWrite(RESET_PIN, LOW);
+    this->writeToPort5(0xFF);
 }
 void MK3870::powerOn(void)
 {
+    digitalWrite(XTAL2_PIN, HIGH);
+    digitalWrite(RESET_PIN, HIGH);
+    this->writeToPort5(0);
     digitalWrite(MK3870_POWER_PIN, LOW);
     delayMicroseconds(CLOCK_DELAY_US);
 }
@@ -124,7 +131,6 @@ void MK3870::writeToPort5(uint8_t value)
     static uint8_t BITS[8] = {1,2,4,8,16,32,64,128};
     // invert the value since port is active low
     uint8_t inverted_value = ~value;
-#if 1
     for (uint8_t i = 0; i < 8; i++) {
         uint8_t bit_value = LOW;
         if (inverted_value&BITS[i]) {
@@ -132,9 +138,6 @@ void MK3870::writeToPort5(uint8_t value)
         }
         digitalWrite(PORT5_PINS[i],bit_value);
     }
-#else
-    PINC = inverted_value;
-#endif
 }
 
 void MK3870::prepareForDump(void)
@@ -144,7 +147,6 @@ void MK3870::prepareForDump(void)
     this->setTestVoltage3p5();
     this->reset();
 
-#if 1
     // wait for strobe = LOW after reset
     // need to drive clock "manually" here to detect when strobe
     // resets. When it does reset, ensure the external clock is aligned to
@@ -178,13 +180,10 @@ void MK3870::prepareForDump(void)
             strobe_not_found = false;
         }
     }
-#if 1
     if (half_off) {
         // if we are here, the strobe is 1/2 a clock off. tick it again
         this->tickExternalClock();
     }
-#endif
-#endif
 }
 
 void MK3870::writeBytecodeAndTick(uint8_t bytecode, uint8_t internal_ticks)
