@@ -18,6 +18,8 @@ const uint8_t ACTIVATE_TEST_7V_PIN = PIN_PD6;
 const uint8_t ACTIVATE_TEST_3p5V_PIN = PIN_PD7;
 const uint8_t MK3870_POWER_PIN = PIN_PD5;
 
+const uint8_t BITS[8] = {1,2,4,8,16,32,64,128};
+
 MK3870::MK3870()
 {
     this->setupPins();
@@ -128,7 +130,6 @@ uint8_t MK3870::readFromPort4(void)
 
 void MK3870::writeToPort5(uint8_t value)
 {
-    static uint8_t BITS[8] = {1,2,4,8,16,32,64,128};
     // invert the value since port is active low
     uint8_t inverted_value = ~value;
     for (uint8_t i = 0; i < 8; i++) {

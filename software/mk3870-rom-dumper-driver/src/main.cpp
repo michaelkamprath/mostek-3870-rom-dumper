@@ -16,8 +16,10 @@ void printByteValue(uint8_t value);
 
 // constants
 // The ROM size to be dumped. Adjust according to the MK3870 variant being dumped.
-const uint16_t ROM_BYTES = 2048;
-// The ATMEGA1284P pin the sttus LED is attaced to
+#ifndef ROM_BYTES
+#define ROM_BYTES 2048
+#endif
+// The ATMEGA1284P pin the status LED is attaced to
 const uint8_t STATUS_LED_PIN = PIN_PB0;
 
 // globals
