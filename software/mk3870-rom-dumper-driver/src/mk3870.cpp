@@ -212,6 +212,7 @@ bool MK3870::dumpROM(uint16_t rom_bytes, uint8_t* data_ptr, int led_pin = -1) {
         digitalWrite(led_pin, HIGH);
     }
     this->powerOn();
+    delay(1);
     this->prepareForDump();
     this->setTestVoltage7();
     this->writeToPort5(0);
