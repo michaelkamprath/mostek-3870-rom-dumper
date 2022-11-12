@@ -8,3 +8,5 @@ To use, simply build the circuit provided in the `schematic` directory, and then
 
 ## License
 Use as you see fit. Attribution would be appreciated.
+
+![MOSTEK 3870 ROM Dumper Circuit](./documentation/mostek_3870_rom_dumper.jpeg)
